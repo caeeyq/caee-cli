@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function core() {
-    // TODO
+function log() {
+    console.log('demo packages');
 }
-exports.default = core;
+exports.default = log;
