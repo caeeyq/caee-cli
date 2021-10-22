@@ -1,0 +1,19 @@
+{
+  "name": "@caee/cli-utils-log",
+  "version": "0.0.0",
+  "description": "cli utils",
+  "author": "yujie <158392613@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}
