@@ -11,5 +11,6 @@
       "tsconfig.json",
       "*.md"
     ]
-  }
+  },
+  "granularPathspec": false
 }
