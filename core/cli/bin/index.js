@@ -1,5 +1,8 @@
 #! /usr/bin/env node
+const importLocal = require('import-local')
 
-const { core } = require('../lib')
-console.log('hello caee cli')
-core()
+if (importLocal(__dirname)) {
+  require('npmlog').info('caee-cli', '正在使用caee-cli本地版本')
+} else {
+  require('../lib').core(process.argv.slice(2))
+}

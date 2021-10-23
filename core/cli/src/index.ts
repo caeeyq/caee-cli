@@ -1,5 +1,3 @@
-import { log } from '@caee/cli-utils-log'
-
 export function core() {
-  log()
+  console.log('hellooooo11111ooo')
 }

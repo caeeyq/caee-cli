@@ -1,3 +1,3 @@
 export function log() {
-  console.log('hello demo packages!!!!')
+  console.log('hello demo packageshahah')
 }

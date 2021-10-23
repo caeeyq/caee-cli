@@ -20,7 +20,8 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@caee/cli-utils-log": "^0.0.9"
+    "import-local": "^3.0.3",
+    "npmlog": "^5.0.1"
   },
   "devDependencies": {
     "@types/node": "^16.11.3"
