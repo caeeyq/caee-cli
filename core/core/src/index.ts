@@ -1,5 +1,9 @@
+import log from '@caee/cli-utils-log'
+
 function core() {
-  // TODO
+  log()
 }
+
+core()
 
 export default core
