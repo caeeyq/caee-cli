@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "npm run build && caee",
     "publish": "npm run build && lerna publish",
-    "clean": "lerna exec -- shx rm -rf lib && shx echo Done",
-    "build": "npm run clean && lerna exec -- tsc"
+    "clean": "lerna exec -- shx rm -rf lib && shx echo =====clear-end=====",
+    "build": "npm run clean && lerna exec -- tsc && shx echo =====build-end====="
   },
   "keywords": [],
   "author": "",
