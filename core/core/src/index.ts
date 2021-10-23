@@ -1,7 +1,5 @@
-import log from '@caee/cli-utils-log'
+import { log } from '@caee/cli-utils-log'
 
-function core() {
+export function core() {
   log()
 }
-
-export default core
