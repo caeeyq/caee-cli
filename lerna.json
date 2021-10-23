@@ -4,13 +4,5 @@
     "core/*",
     "utils/*"
   ],
-  "publish": {
-    "ignoreChanges": [
-      "package-lock.json",
-      "src/*",
-      "tsconfig.json",
-      "*.md"
-    ]
-  },
   "granularPathspec": false
 }
