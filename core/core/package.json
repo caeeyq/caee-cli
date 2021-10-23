@@ -1,6 +1,6 @@
 {
   "name": "@caee/cli-core",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "cli core",
   "author": "yujie <158392613@qq.com>",
   "homepage": "",
@@ -20,7 +20,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@caee/cli-utils-log": "^0.0.7"
+    "@caee/cli-utils-log": "^0.0.8"
   },
   "devDependencies": {
     "@types/node": "^16.11.3"
