@@ -19,5 +19,8 @@
   "devDependencies": {
     "@caee/cli-utils-log": "^0.0.4",
     "@types/node": "^16.11.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

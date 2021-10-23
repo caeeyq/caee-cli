@@ -18,5 +18,8 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
