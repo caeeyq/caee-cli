@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "npm run build && caee",
     "publish": "npm run build && lerna publish",
+    "build": "npm run clean && lerna exec -- tsc && shx echo =====build-end=====",
     "clean": "lerna exec -- shx rm -rf lib && shx echo =====clear-end=====",
-    "build": "npm run clean && lerna exec -- tsc && shx echo =====build-end====="
+    "relink": "lerna exec --scope @caee/cli-core npm unlink && lerna exec --scope @caee/cli-core npm link"
   },
   "keywords": [],
   "author": "",

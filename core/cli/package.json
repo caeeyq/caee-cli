@@ -20,11 +20,15 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
+    "@caee/cli-utils-log": "file:../../utils/log",
+    "colors": "^1.4.0",
     "import-local": "^3.0.3",
-    "@caee/cli-utils-log": "file:../../utils/log"
+    "semver": "^7.3.5"
   },
   "devDependencies": {
-    "@types/node": "^16.11.3"
+    "@types/colors": "^1.2.1",
+    "@types/node": "^16.11.3",
+    "@types/semver": "^7.3.9"
   },
   "publishConfig": {
     "access": "public"
