@@ -1,5 +1,5 @@
 function log() {
-  console.log('demo packages')
+  console.log('hello demo packages!')
 }
 
 export default log

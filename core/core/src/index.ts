@@ -4,6 +4,4 @@ function core() {
   log()
 }
 
-core()
-
 export default core

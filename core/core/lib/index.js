@@ -7,5 +7,4 @@ const cli_utils_log_1 = __importDefault(require("@caee/cli-utils-log"));
 function core() {
     (0, cli_utils_log_1.default)();
 }
-core();
 exports.default = core;
