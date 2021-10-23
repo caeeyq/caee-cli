@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "import-local": "^3.0.3",
-    "npmlog": "^5.0.1",
     "@caee/cli-utils-log": "file:../../utils/log"
   },
   "devDependencies": {
