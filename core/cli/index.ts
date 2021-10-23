@@ -1,6 +1,9 @@
 import semver from 'semver'
 import colors from 'colors/safe'
 import rootCheck from 'root-check'
+import useHome from 'user-home'
+import pathExists from 'path-exists'
+
 import { log } from '@caee/cli-utils-log'
 import pkg from './package.json'
 import { LOWEST_NODE_VERSION } from './const'
@@ -10,6 +13,7 @@ export function core() {
     checkPkgVersion()
     checkNodeVersion()
     checkRoot()
+    checkUserHome()
   } catch (error) {
     log.error('cli', (error as Error).message)
   }
@@ -37,4 +41,13 @@ function checkNodeVersion() {
  */
 function checkRoot() {
   rootCheck()
+}
+
+/**
+ * 检查用户主目录
+ */
+function checkUserHome() {
+  if (!useHome || !pathExists.sync(useHome)) {
+    throw new Error(colors.red('当前系统用户主目录不存在！'))
+  }
 }
