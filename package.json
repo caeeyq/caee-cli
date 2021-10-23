@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "clean": "lerna exec -- shx rm -rf lib && shx echo Done",
-    "build": "lerna exec -- tsc"
+    "build": "npm run clean && lerna exec -- tsc",
+    "publish": "npm run build && lerna publish"
   },
   "keywords": [],
   "author": "",
