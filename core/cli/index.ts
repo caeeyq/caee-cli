@@ -3,10 +3,13 @@ import colors from 'colors/safe'
 import rootCheck from 'root-check'
 import useHome from 'user-home'
 import pathExists from 'path-exists'
+import minimist from 'minimist'
+import dotenv from 'dotenv'
+import path from 'path'
 
 import { log } from '@caee/cli-utils-log'
 import pkg from './package.json'
-import { LOWEST_NODE_VERSION } from './const'
+import { LOWEST_NODE_VERSION, DEFAULT_CLI_HOME } from './const'
 
 export function core() {
   try {
@@ -14,8 +17,59 @@ export function core() {
     checkNodeVersion()
     checkRoot()
     checkUserHome()
+    checkInputArgs()
+    checkEnv()
   } catch (error) {
     log.error('cli', (error as Error).message)
+  }
+}
+
+/**
+ * 检查环境变量
+ */
+function checkEnv() {
+  const envPath = path.resolve(useHome, '.caee-cli.env')
+  dotenv.config({
+    path: envPath,
+  })
+  createDefaultEnv()
+  log.verbose('cli', process.env.CLI_HOME_PATH)
+}
+
+/**
+ * 生成默认环境变量
+ */
+function createDefaultEnv() {
+  const cliConfig = {
+    cliHomePath: '',
+  }
+  if (process.env.CLI_HOME) {
+    cliConfig.cliHomePath = path.join(useHome, process.env.CLI_HOME)
+  } else {
+    cliConfig.cliHomePath = path.join(useHome, DEFAULT_CLI_HOME)
+  }
+  process.env.CLI_HOME_PATH = cliConfig.cliHomePath
+}
+
+/**
+ * 检查命令入参
+ */
+function checkInputArgs() {
+  const args = minimist(process.argv.slice(2))
+  checkArgs(args)
+}
+
+/**
+ * 检查入参
+ * @param args 入参
+ */
+function checkArgs(args: minimist.ParsedArgs) {
+  if (args.debug) {
+    log.level = 'verbose'
+    process.env.LOG_LEVEL = 'verbose'
+  } else {
+    log.level = 'info'
+    process.env.LOG_LEVEL = 'info'
   }
 }
 
