@@ -8,6 +8,7 @@ import dotenv from 'dotenv'
 import path from 'path'
 
 import { log } from '@caee/cli-utils-log'
+import { getLastVersion } from '@caee/cli-utils-get-npm-info'
 import pkg from './package.json'
 import { LOWEST_NODE_VERSION, DEFAULT_CLI_HOME } from './const'
 
@@ -19,8 +20,24 @@ export function core() {
     checkUserHome()
     checkInputArgs()
     checkEnv()
+    checkGlobalUpdate()
   } catch (error) {
     log.error('cli', (error as Error).message)
+  }
+}
+
+/**
+ * 检查本地版本是否需要升级
+ */
+async function checkGlobalUpdate() {
+  const { version: currentVersion, name: pkgName } = pkg
+  const lastVersion = await getLastVersion(currentVersion, pkgName)
+  if (lastVersion) {
+    log.warn(
+      'cli',
+      colors.yellow(`请手动更新 ${pkgName}, 当前版本 ${currentVersion}, 最新版本 ${lastVersion}
+更新命令: npm install -g ${pkgName}`),
+    )
   }
 }
 

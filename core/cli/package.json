@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@caee/cli-utils-log": "file:../../utils/log",
+    "@caee/cli-utils-get-npm-info": "file:../../utils/get-npm-info",
     "colors": "^1.4.0",
     "dotenv": "^10.0.0",
     "import-local": "^3.0.3",
