@@ -6,6 +6,7 @@ import pathExists from 'path-exists'
 import minimist from 'minimist'
 import dotenv from 'dotenv'
 import path from 'path'
+import { Command } from 'commander'
 
 import { log } from '@caee/cli-utils-log'
 import { getLastVersion } from '@caee/cli-utils-get-npm-info'
@@ -21,8 +22,48 @@ export function core() {
     checkInputArgs()
     checkEnv()
     checkGlobalUpdate()
+    registCommander()
   } catch (error) {
     log.error('cli', (error as Error).message)
+  }
+}
+
+/** 
+ * 注册脚手架命令
+ */
+function registCommander() {
+  const program = new Command()
+
+  program
+    .version(pkg.version)
+    .name(Object.keys(pkg.bin)[0])
+    .usage('<command> [options]')
+    .option('-d, --debug', '是否开启调试模式', false)
+
+  program.on('option:debug', () => {
+    const { debug } = program.opts()
+    if (debug) {
+      log.level = 'verbose'
+      process.env.LOG_LEVEL = 'verbose'
+    } else {
+      log.level = 'info'
+      process.env.LOG_LEVEL = 'info'
+    }
+  })
+
+  program.on('command:*', opts => {
+    const avaiableCommand = program.commands.map(com => com.name)
+    log.error('cli', colors.red(`未知命令 ${opts[0]}`))
+    if (avaiableCommand.length > 0) {
+      log.error('cli', colors.red(`当前可用命令 ${avaiableCommand.join(', ')}`))
+    }
+  })
+
+  program.parse(process.argv)
+
+  if (program.args.length < 1) {
+    program.outputHelp()
+    console.log()
   }
 }
 
@@ -50,7 +91,7 @@ function checkEnv() {
     path: envPath,
   })
   createDefaultEnv()
-  log.verbose('cli', process.env.CLI_HOME_PATH)
+  log.verbose('cli', `当前脚手架缓存目录: ${process.env.CLI_HOME_PATH}`)
 }
 
 /**
