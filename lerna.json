@@ -2,7 +2,8 @@
   "version": "0.0.11",
   "packages": [
     "core/*",
-    "utils/*"
+    "utils/*",
+    "commands/*"
   ],
   "granularPathspec": false
 }

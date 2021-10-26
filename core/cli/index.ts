@@ -10,6 +10,8 @@ import { Command } from 'commander'
 
 import { log } from '@caee/cli-utils-log'
 import { getLastVersion } from '@caee/cli-utils-get-npm-info'
+import { init } from '@caee/cli-command-init'
+
 import pkg from './package.json'
 import { LOWEST_NODE_VERSION, DEFAULT_CLI_HOME } from './const'
 
@@ -28,7 +30,7 @@ export function core() {
   }
 }
 
-/** 
+/**
  * 注册脚手架命令
  */
 function registCommander() {
@@ -39,6 +41,14 @@ function registCommander() {
     .name(Object.keys(pkg.bin)[0])
     .usage('<command> [options]')
     .option('-d, --debug', '是否开启调试模式', false)
+
+  program
+    .command('init [projectName]')
+    .option('-f, --force', '是否覆盖当前目录，强a制初始化项目')
+    .action(init)
+  // .action((projectName: string, opts) => {
+  //   console.log(projectName, opts)
+  // })
 
   program.on('option:debug', () => {
     const { debug } = program.opts()
