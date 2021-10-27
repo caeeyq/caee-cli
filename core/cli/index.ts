@@ -41,24 +41,27 @@ function registCommander() {
     .name(Object.keys(pkg.bin)[0])
     .usage('<command> [options]')
     .option('-d, --debug', '是否开启调试模式', false)
+    .option('-tp, --targetPath <targetPath>', '是否执行指定目录的命令', '')
 
   program
     .command('init [projectName]')
     .option('-f, --force', '是否覆盖当前目录，强a制初始化项目')
     .action(init)
-  // .action((projectName: string, opts) => {
-  //   console.log(projectName, opts)
-  // })
 
   program.on('option:debug', () => {
     const { debug } = program.opts()
     if (debug) {
       log.level = 'verbose'
-      process.env.LOG_LEVEL = 'verbose'
+      process.env.CAEE_CLI_LOG_LEVEL = 'verbose'
     } else {
       log.level = 'info'
-      process.env.LOG_LEVEL = 'info'
+      process.env.CAEE_CLI_LOG_LEVEL = 'info'
     }
+  })
+
+  program.on('option:targetPath', () => {
+    const { targetPath } = program.opts()
+    process.env.CAEE_CLI_TARGET_PATH = targetPath
   })
 
   program.on('command:*', opts => {
@@ -101,7 +104,7 @@ function checkEnv() {
     path: envPath,
   })
   createDefaultEnv()
-  log.verbose('cli', `当前脚手架缓存目录: ${process.env.CLI_HOME_PATH}`)
+  log.verbose('cli', `当前脚手架缓存目录: ${process.env.CAEE_CLI_HOME_PATH}`)
 }
 
 /**
@@ -111,12 +114,12 @@ function createDefaultEnv() {
   const cliConfig = {
     cliHomePath: '',
   }
-  if (process.env.CLI_HOME) {
-    cliConfig.cliHomePath = path.join(useHome, process.env.CLI_HOME)
+  if (process.env.CAEE_CLI_HOME) {
+    cliConfig.cliHomePath = path.join(useHome, process.env.CAEE_CLI_HOME)
   } else {
     cliConfig.cliHomePath = path.join(useHome, DEFAULT_CLI_HOME)
   }
-  process.env.CLI_HOME_PATH = cliConfig.cliHomePath
+  process.env.CAEE_CLI_HOME_PATH = cliConfig.cliHomePath
 }
 
 /**
@@ -134,10 +137,10 @@ function checkInputArgs() {
 function checkArgs(args: minimist.ParsedArgs) {
   if (args.debug) {
     log.level = 'verbose'
-    process.env.LOG_LEVEL = 'verbose'
+    process.env.CAEE_CLI_LOG_LEVEL = 'verbose'
   } else {
     log.level = 'info'
-    process.env.LOG_LEVEL = 'info'
+    process.env.CAEE_CLI_LOG_LEVEL = 'info'
   }
 }
 
