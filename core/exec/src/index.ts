@@ -11,6 +11,6 @@ export async function exec(...args: unknown[]) {
 
   const pkg = new Package(cmdName, 'latest', targetPath)
   console.log('pkg', pkg)
-  console.log('targetPath', pkg.getRootFilePath())
-  console.log('exec CAEE_CLI_TARGET_PATH', process.env.CAEE_CLI_TARGET_PATH)
+  console.log('入口文件地址', pkg.getRootFilePath())
+  console.log('目标目录', process.env.CAEE_CLI_TARGET_PATH)
 }
