@@ -1,9 +1,10 @@
-import pkg from '../package.json'
+import pkg from './package.json'
 import colors from 'colors/safe'
 
 import { Command } from 'commander'
 import { log } from '@caee/cli-utils-log'
 import { init } from '@caee/cli-command-init'
+import { exec } from '@caee/cli-core-exec'
 
 import { prepare } from './prepare'
 
@@ -32,7 +33,7 @@ function registCommander() {
   program
     .command('init [projectName]')
     .option('-f, --force', '是否覆盖当前目录，强a制初始化项目')
-    .action(init)
+    .action(exec)
 
   program.on('option:debug', () => {
     const { debug } = program.opts()

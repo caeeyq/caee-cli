@@ -23,6 +23,7 @@
     "@caee/cli-utils-get-npm-info": "file:../../utils/get-npm-info",
     "@caee/cli-utils-log": "file:../../utils/log",
     "@caee/cli-command-init": "file:../../commands/init",
+    "@caee/cli-core-exec": "file:../exec",
     "colors": "^1.4.0",
     "commander": "^8.3.0",
     "dotenv": "^10.0.0",

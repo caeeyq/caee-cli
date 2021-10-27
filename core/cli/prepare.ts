@@ -10,7 +10,7 @@ import path from 'path'
 import { log } from '@caee/cli-utils-log'
 import { getLastVersion } from '@caee/cli-utils-get-npm-info'
 
-import pkg from '../package.json'
+import pkg from './package.json'
 import { LOWEST_NODE_VERSION, DEFAULT_CLI_HOME } from './const'
 
 export async function prepare() {
