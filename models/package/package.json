@@ -27,7 +27,9 @@
     "url": "https://github.com/caeeyq/caee-cli/issues"
   },
   "dependencies": {
-    "pkg-dir": "5.0.0",
-    "@caee/cli-utils-common": "../../utils/common"
+    "@caee/cli-utils-common": "../../utils/common",
+    "@caee/cli-utils-get-npm-info": "../../utils/get-npm-info",
+    "npminstall": "^5.2.1",
+    "pkg-dir": "5.0.0"
   }
 }

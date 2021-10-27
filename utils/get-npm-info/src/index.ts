@@ -9,7 +9,7 @@ export async function getNpmInfo(pkgName: string, registry?: string) {
   return axios.get<NpmInfo>(npmInfoUrl).then(res => res.data)
 }
 
-function getDefaultRegistryUrl(isOriginal = true) {
+export function getDefaultRegistryUrl(isOriginal = true) {
   const originalUrl = 'https://registry.npmjs.org'
   const taobaoUrl = 'https://registry.npm.taobao.org'
   return isOriginal ? originalUrl : taobaoUrl
