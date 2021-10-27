@@ -1,5 +1,5 @@
 {
-  "name": "@caee/cli-core-exec",
+  "name": "@caee/cli-utils-common",
   "version": "0.0.11",
   "description": "> TODO: description",
   "author": "yujie <158392613@qq.com>",
@@ -25,11 +25,5 @@
   },
   "bugs": {
     "url": "https://github.com/caeeyq/caee-cli/issues"
-  },
-  "dependencies": {
-    "@caee/cli-models-package": "file:../../models/package"
-  },
-  "devDependencies": {
-    "commander": "^8.3.0"
   }
 }

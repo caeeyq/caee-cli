@@ -8,7 +8,10 @@
     "publish": "npm run build && lerna publish",
     "build": "npm run clean && lerna exec -- tsc && shx echo =====build-end=====",
     "clean": "lerna exec -- shx rm -rf lib && shx echo =====clear-end=====",
-    "relink": "lerna exec --scope @caee/cli-core npm unlink && lerna exec --scope @caee/cli-core npm link"
+    "relink:cliCore": "lerna exec --scope @caee/cli-core npm unlink && lerna exec --scope @caee/cli-core npm link",
+    "relink:cliExec": "lerna exec --scope @caee/cli-core-exec npm unlink && lerna exec --scope @caee/cli-core-exec npm link",
+    "relink:cliPackage": "lerna exec --scope @caee/cli-models-package npm unlink && lerna exec --scope @caee/cli-models-package npm link",
+    "relink": "npm run relink:cliPackage && npm run relink:cliExec && npm run relink:cliCore"
   },
   "keywords": [],
   "author": "",

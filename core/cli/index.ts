@@ -31,7 +31,7 @@ function registCommander() {
     .option('-tp, --targetPath <targetPath>', '是否执行指定目录的命令', '')
 
   program
-    .command('init [projectName]')
+    .command('init [projectName] [arojectName]')
     .option('-f, --force', '是否覆盖当前目录，强a制初始化项目')
     .action(exec)
 
