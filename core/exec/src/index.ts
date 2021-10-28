@@ -9,21 +9,28 @@ const SETTING_MAP: Record<string, string> = {
 const CACHE_DIR = 'dependencies'
 
 export async function exec(...args: unknown[]) {
-  const targetPath =
-    process.env.CAEE_CLI_TARGET_PATH || path.resolve(process.env.CAEE_CLI_HOME_PATH, CACHE_DIR)
+  let pkg: Package
+  let targetPath = process.env.CAEE_CLI_TARGET_PATH
   const pkgName = SETTING_MAP[(args[args.length - 1] as Command).name()]
   const pkgVersion = 'latest'
-  log.verbose('exec', '目标包名', pkgName)
-  log.verbose('exec', '目标包版本', pkgVersion)
-  log.verbose('exec', '目标目录', targetPath)
-  const pkg = new Package(pkgName, pkgVersion, targetPath)
-  if (pkg.exists()) {
-    // 更新pkg
+
+  if (targetPath) {
+    // 如果用户输入了targetPath
+    pkg = new Package(pkgName, pkgVersion, targetPath)
   } else {
-    // 安装pkg
-    await pkg.install()
+    targetPath = path.resolve(process.env.CAEE_CLI_HOME_PATH, CACHE_DIR)
+    const storePath = path.resolve(targetPath, 'node_modules')
+    pkg = new Package(pkgName, pkgVersion, targetPath, storePath)
+    if (await pkg.exists()) {
+      log.verbose('exec', `本地存在 ${pkgName} ，检查版本是否为最新...`)
+      // 更新pkg
+    } else {
+      log.verbose('exec', `本地不存在 ${pkgName} ，进入安装流程...`)
+      // 安装pkg
+      await pkg.install()
+    }
   }
+
   const rootFilePath = pkg.getRootFilePath()
-  log.verbose('exec', '入口文件地址', rootFilePath)
   if (rootFilePath) require(rootFilePath).default(...args)
 }

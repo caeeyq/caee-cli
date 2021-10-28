@@ -29,7 +29,9 @@
   "dependencies": {
     "@caee/cli-utils-common": "../../utils/common",
     "@caee/cli-utils-get-npm-info": "../../utils/get-npm-info",
+    "@caee/cli-utils-log": "../../utils/log",
     "npminstall": "4.10.0",
+    "path-exists": "4.0.0",
     "pkg-dir": "5.0.0"
   }
 }
