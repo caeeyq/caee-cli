@@ -18,16 +18,12 @@ export class Package {
   constructor(
     packageName_: string,
     packageVersion_: string,
-    targetPath_?: string,
+    targetPath_: string,
     storePath_?: string,
   ) {
     this.packageName = packageName_
     this.packageVersion = packageVersion_
-    if (!targetPath_) {
-      this.targetPath = path.resolve(process.env.CAEE_CLI_HOME_PATH, 'dependencies')
-    } else {
-      this.targetPath = targetPath_
-    }
+    this.targetPath = targetPath_
     if (!storePath_) {
       this.storePath = path.resolve(this.targetPath, 'node_modules')
     } else {
@@ -38,13 +34,15 @@ export class Package {
   /**
    * 检查包是否存在
    */
-  exists() {}
+  exists() {
+    return false
+  }
 
   /**
    * 安装包
    */
-  install() {
-    npminstall({
+  async install() {
+    await npminstall({
       root: this.targetPath,
       storeDir: this.storePath,
       registry: getDefaultRegistryUrl(),

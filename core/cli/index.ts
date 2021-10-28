@@ -3,7 +3,7 @@ import colors from 'colors/safe'
 
 import { Command } from 'commander'
 import { log } from '@caee/cli-utils-log'
-import { init } from '@caee/cli-command-init'
+import init from '@caee/cli-command-init'
 import { exec } from '@caee/cli-core-exec'
 
 import { prepare } from './prepare'
@@ -14,6 +14,9 @@ export async function core() {
     registCommander()
   } catch (error) {
     log.error('cli', (error as Error).message)
+    if (process.env.CAEE_CLI_LOG_LEVEL === 'verbose') {
+      console.log(error)
+    }
   }
 }
 
@@ -31,7 +34,7 @@ function registCommander() {
     .option('-tp, --targetPath <targetPath>', '是否执行指定目录的命令', '')
 
   program
-    .command('init [projectName] [arojectName]')
+    .command('init [projectName]')
     .option('-f, --force', '是否覆盖当前目录，强a制初始化项目')
     .action(exec)
 

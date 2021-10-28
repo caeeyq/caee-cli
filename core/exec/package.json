@@ -27,7 +27,8 @@
     "url": "https://github.com/caeeyq/caee-cli/issues"
   },
   "dependencies": {
-    "@caee/cli-models-package": "file:../../models/package"
+    "@caee/cli-models-package": "file:../../models/package",
+    "@caee/cli-utils-log": "file:../../utils/log"
   },
   "devDependencies": {
     "commander": "^8.3.0"
