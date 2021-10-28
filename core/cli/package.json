@@ -20,7 +20,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@caee/cli-command-init": "file:../../commands/init",
+    "@caee/cli-command-init": "file:../../command/init",
     "@caee/cli-core-exec": "file:../exec",
     "@caee/cli-utils-get-npm-info": "file:../../utils/get-npm-info",
     "@caee/cli-utils-log": "file:../../utils/log",

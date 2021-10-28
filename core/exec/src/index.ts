@@ -4,7 +4,7 @@ import { Command } from 'commander'
 import path from 'path'
 
 const SETTING_MAP: Record<string, string> = {
-  init: '@caee/cli-commands-init',
+  init: '@caee/cli-command-init',
 }
 const CACHE_DIR = 'dependencies'
 
