@@ -25,5 +25,8 @@
   },
   "bugs": {
     "url": "https://github.com/caeeyq/caee-cli/issues"
+  },
+  "dependencies": {
+    "@caee/cli-models-command": "file:../../models/command"
   }
 }
