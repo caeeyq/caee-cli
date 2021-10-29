@@ -12,7 +12,7 @@ export async function exec(...args: unknown[]) {
   let pkg: Package
   let targetPath = process.env.CAEE_CLI_TARGET_PATH
   const pkgName = SETTING_MAP[(args[args.length - 1] as Command).name()]
-  const pkgVersion = '0.0.13'
+  const pkgVersion = 'latest'
 
   if (targetPath) {
     // 如果用户输入了targetPath  lla

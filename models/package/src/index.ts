@@ -22,6 +22,9 @@ export class Package {
 
   private catchFilePathSuffix: string
 
+  /** package缓存文件夹 */
+  private packageFileCollection: string
+
   constructor(
     packageName_: string,
     packageVersion_: string,
@@ -34,6 +37,7 @@ export class Package {
     this.storePath = storePath_
     this.catchFilePathPrefix = this.packageName.replace('/', '_')
     this.catchFilePathSuffix = this.packageName.split('/')[0]
+    this.packageFileCollection = this.packageName.split('/')[1]
 
     log.verbose('package construct', 'packageName', this.packageName)
     log.verbose('package construct', 'packageVersion', this.packageVersion)
@@ -126,15 +130,22 @@ export class Package {
    * 获取入口文件地址
    */
   getRootFilePath() {
-    const rootDir = pkgDir.sync(this.targetPath)
-    if (rootDir) {
-      const pkgPath = path.resolve(rootDir, 'package.json')
-      const pkgFile = require(pkgPath)
-      if (pkgFile && pkgFile.main) {
-        const rootFilePath = formatPath(path.resolve(rootDir, pkgFile.main))
-        log.verbose('package getRootFilePath', 'rootFilePath', rootFilePath)
-        return rootFilePath
+    function _getRootPath(targetPath: string) {
+      const rootDir = pkgDir.sync(targetPath)
+      if (rootDir) {
+        const pkgPath = path.resolve(rootDir, 'package.json')
+        const pkgFile = require(pkgPath)
+        if (pkgFile && pkgFile.main) {
+          const rootFilePath = formatPath(path.resolve(rootDir, pkgFile.main))
+          log.verbose('package getRootFilePath', 'rootFilePath', rootFilePath)
+          return rootFilePath
+        }
       }
+    }
+    if (this.storePath) {
+      return _getRootPath(path.resolve(this.catchFilePath, this.packageFileCollection))
+    } else {
+      return _getRootPath(this.targetPath)
     }
   }
 }
