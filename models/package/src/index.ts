@@ -110,12 +110,13 @@ export class Package {
           `package update ${this.packageName}`,
           `本地版本${this.packageVersion}过旧, 正在更新最新版本...`,
         )
-        return npminstall({
+        await npminstall({
           root: this.targetPath,
           storeDir: this.storePath!,
           registry: getDefaultRegistryUrl(),
           pkgs: [{ name: this.packageName, version: pkgLastVersion }],
         })
+        this.packageVersion = pkgLastVersion
       }
       return catchPath
     }
