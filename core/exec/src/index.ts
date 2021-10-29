@@ -15,7 +15,7 @@ export async function exec(...args: unknown[]) {
   const pkgVersion = '0.0.13'
 
   if (targetPath) {
-    // 如果用户输入了targetPath  ll
+    // 如果用户输入了targetPath  lla
     pkg = new Package(pkgName, pkgVersion, targetPath)
   } else {
     targetPath = path.resolve(process.env.CAEE_CLI_HOME_PATH, CACHE_DIR)
