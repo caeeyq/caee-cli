@@ -30,8 +30,12 @@
     "@caee/cli-utils-common": "../../utils/common",
     "@caee/cli-utils-get-npm-info": "../../utils/get-npm-info",
     "@caee/cli-utils-log": "../../utils/log",
+    "fs-extra": "^10.0.0",
     "npminstall": "4.10.0",
     "path-exists": "4.0.0",
     "pkg-dir": "5.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13"
   }
 }

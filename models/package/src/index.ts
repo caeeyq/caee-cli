@@ -2,6 +2,7 @@ import pkgDir from 'pkg-dir'
 import path from 'path'
 import npminstall from 'npminstall'
 import pathExists from 'path-exists'
+import { mkdirpSync } from 'fs-extra'
 
 import { formatPath } from '@caee/cli-utils-common'
 import { getDefaultRegistryUrl, getLastVersion } from '@caee/cli-utils-get-npm-info'
@@ -43,6 +44,9 @@ export class Package {
   }
 
   async prepare() {
+    if (this.storePath && !pathExists.sync(this.storePath)) {
+      mkdirpSync(this.storePath)
+    }
     if (this.packageVersion === 'latest') {
       this.packageVersion = (await getLastVersion('0.0.0', this.packageName)) || 'latest'
     }
@@ -52,6 +56,13 @@ export class Package {
     const fileName = `_${this.catchFilePathPrefix}@${this.packageVersion}@${this.catchFilePathSuffix}`
     const catchPath = path.resolve(this.storePath!, fileName)
     log.verbose('package get catchFilePath', 'value', catchPath)
+    return catchPath
+  }
+
+  getSpecificCatchFilePath(version: string) {
+    const fileName = `_${this.catchFilePathPrefix}@${version}@${this.catchFilePathSuffix}`
+    const catchPath = path.resolve(this.storePath!, fileName)
+    log.verbose('package getSpecificCatchFilePath', 'catchPath', catchPath)
     return catchPath
   }
 
@@ -71,21 +82,44 @@ export class Package {
   /**
    * 安装包
    */
-  install() {
-    if (this.storePath) {
-      return npminstall({
+  async install() {
+    await this.prepare()
+    this.storePath &&
+      (await npminstall({
         root: this.targetPath,
         storeDir: this.storePath,
         registry: getDefaultRegistryUrl(),
         pkgs: [{ name: this.packageName, version: this.packageVersion }],
-      })
-    }
+      }))
   }
 
   /**
    * 更新包
    */
-  update() {}
+  async update() {
+    await this.prepare()
+    const pkgLastVersion = await getLastVersion('0.0.0', this.packageName)
+    log.verbose(
+      `package update ${this.packageName}`,
+      `获取到最新版本号${pkgLastVersion}, 查看是否需要更新...`,
+    )
+    if (pkgLastVersion) {
+      const catchPath = this.getSpecificCatchFilePath(pkgLastVersion)
+      if (!pathExists.sync(catchPath)) {
+        log.verbose(
+          `package update ${this.packageName}`,
+          `本地版本${this.packageVersion}过旧, 正在更新最新版本...`,
+        )
+        return npminstall({
+          root: this.targetPath,
+          storeDir: this.storePath!,
+          registry: getDefaultRegistryUrl(),
+          pkgs: [{ name: this.packageName, version: pkgLastVersion }],
+        })
+      }
+      return catchPath
+    }
+  }
 
   /**
    * 获取入口文件地址
