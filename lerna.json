@@ -3,7 +3,7 @@
   "packages": [
     "core/*",
     "utils/*",
-    "commands/*",
+    "command/*",
     "models/*"
   ],
   "granularPathspec": false
