@@ -1,4 +1,3 @@
-import semver from 'semver'
 import colors from 'colors/safe'
 import rootCheck from 'root-check'
 import useHome from 'user-home'
@@ -11,11 +10,10 @@ import { log } from '@caee/cli-utils-log'
 import { getLastVersion } from '@caee/cli-utils-get-npm-info'
 
 import pkg from './package.json'
-import { LOWEST_NODE_VERSION, DEFAULT_CLI_HOME } from './const'
 
+const DEFAULT_CLI_HOME = '.caee-cli'
 export async function prepare() {
   checkPkgVersion()
-  checkNodeVersion()
   checkRoot()
   checkUserHome()
   checkInputArgs()
@@ -91,16 +89,6 @@ function checkArgs(args: minimist.ParsedArgs) {
  */
 function checkPkgVersion() {
   log.notice('cli', `v${pkg.version}`)
-}
-
-/**
- * 检查本地 node 版本是否符合要求
- */
-function checkNodeVersion() {
-  const currentNodeVersion = process.version
-  if (semver.gt(LOWEST_NODE_VERSION, currentNodeVersion)) {
-    throw new Error(colors.red(`caee-cli 需要安装 v${LOWEST_NODE_VERSION} 以上版本的 Node.js`))
-  }
 }
 
 /**

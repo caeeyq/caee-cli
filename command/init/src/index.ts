@@ -1,27 +1,33 @@
 import { Command } from '@caee/cli-models-command'
+import { log } from '@caee/cli-utils-log'
+import { Command as Commander } from 'commander'
 
 interface InitOpts {
   force?: boolean
 }
 
-type InitArgv = [projectName: string, opts: InitOpts]
+type InitArgv = [projectName: string, opts: InitOpts, cmd: Commander]
 
-export class InitCommand extends Command<InitArgv> {
+export class InitCommand extends Command<InitArgv, InitOpts> {
+  private projectName!: string
+  private force!: boolean
+
   constructor(...argv: InitArgv) {
     super(...argv)
   }
+
   init() {
-    throw new Error('Method not implemented.')
+    this.projectName = this.values[0]
+    this.force = !!this.opts.force
+    log.verbose('InitCommand init', 'projectName', this.projectName)
+    log.verbose('InitCommand init', 'force', this.force)
   }
+
   exec() {
-    throw new Error('Method not implemented.')
+    log.verbose('InitCommand exec', 'run exec')
   }
 }
 
 export default function init(...argv: InitArgv) {
-  const [projectName, opts] = argv
-  console.log('进入init命令aa', projectName)
-  console.log('init command opts', opts)
-  console.log('init command targetPath', process.env.CAEE_CLI_TARGET_PATH)
   return new InitCommand(...argv)
 }

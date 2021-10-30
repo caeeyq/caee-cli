@@ -25,5 +25,15 @@
   },
   "bugs": {
     "url": "https://github.com/caeeyq/caee-cli/issues"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "commander": "^8.3.0",
+    "semver": "^7.3.5",
+    "@caee/cli-utils-log": "file:../../utils/log"
+  },
+  "devDependencies": {
+    "@types/colors": "^1.2.1",
+    "@types/semver": "^7.3.9"
   }
 }
