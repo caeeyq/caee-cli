@@ -2,6 +2,7 @@ import { Package } from '@caee/cli-models-package'
 import { log } from '@caee/cli-utils-log'
 import { Command } from 'commander'
 import path from 'path'
+import cp from 'child_process'
 
 const SETTING_MAP: Record<string, string> = {
   init: '@caee/cli-command-init',
@@ -11,7 +12,8 @@ const CACHE_DIR = 'dependencies'
 export async function exec(...args: unknown[]) {
   let pkg: Package
   let targetPath = process.env.CAEE_CLI_TARGET_PATH
-  const pkgName = SETTING_MAP[(args[args.length - 1] as Command).name()]
+  const cmdName = (args[args.length - 1] as Command).name()
+  const pkgName = SETTING_MAP[cmdName]
   const pkgVersion = 'latest'
 
   if (targetPath) {
@@ -32,6 +34,20 @@ export async function exec(...args: unknown[]) {
     }
   }
 
+  // 执行相应命令逻辑
   const rootFilePath = pkg.getRootFilePath()
-  if (rootFilePath) require(rootFilePath).default(...args)
+  if (rootFilePath) {
+    const command = args[args.length - 1] as any
+    const lessCommand = {} as any
+    Object.keys(command).forEach(key => {
+      if (!key.startsWith('_') && key !== 'parent') {
+        lessCommand[key] = command[key]
+      }
+    })
+    args[args.length - 1] = lessCommand
+    const code = `require('${rootFilePath}').default('${JSON.stringify(args)}')`
+    const child = cp.spawn('node', ['-e', code], { stdio: 'inherit' })
+    child.on('error', e => log.error('exec', e.message))
+    child.on('exit', e => log.verbose('exec', `${cmdName} 命令执行成功`, e))
+  }
 }

@@ -30,7 +30,8 @@
     "colors": "^1.4.0",
     "commander": "^8.3.0",
     "semver": "^7.3.5",
-    "@caee/cli-utils-log": "file:../../utils/log"
+    "@caee/cli-utils-log": "file:../../utils/log",
+    "@caee/cli-utils-common": "file:../../utils/common"
   },
   "devDependencies": {
     "@types/colors": "^1.2.1",

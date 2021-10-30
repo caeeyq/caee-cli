@@ -12,8 +12,8 @@ export class InitCommand extends Command<InitArgv, InitOpts> {
   private projectName!: string
   private force!: boolean
 
-  constructor(...argv: InitArgv) {
-    super(...argv)
+  constructor(argv: InitArgv) {
+    super(argv)
   }
 
   init() {
@@ -28,6 +28,6 @@ export class InitCommand extends Command<InitArgv, InitOpts> {
   }
 }
 
-export default function init(...argv: InitArgv) {
-  return new InitCommand(...argv)
+export default function init(argv: InitArgv) {
+  return new InitCommand(argv)
 }

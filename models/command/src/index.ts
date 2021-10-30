@@ -2,9 +2,10 @@ import semver from 'semver'
 import colors from 'colors/safe'
 import { Command as Commander } from 'commander'
 import { log } from '@caee/cli-utils-log'
+import { isString } from '@caee/cli-utils-common'
 
 export const LOWEST_NODE_VERSION = '12.0.0'
-export abstract class Command<T extends Array<unknown>, O extends object> {
+export abstract class Command<T extends Array<unknown> | string, O extends object> {
   /** 传入的所有参数 */
   protected argv: T
   /** commander 库的 Command 对象 */
@@ -13,8 +14,12 @@ export abstract class Command<T extends Array<unknown>, O extends object> {
   protected values!: string[]
   /** 命令选项 */
   protected opts!: O
-  constructor(...argv_: T) {
-    this.argv = argv_
+  constructor(argv_: T) {
+    if (isString(argv_)) {
+      this.argv = JSON.parse(argv_)
+    } else {
+      this.argv = argv_
+    }
     const runner = new Promise((resolve, reject) => {
       const chain = Promise.resolve()
       chain
