@@ -1,7 +1,7 @@
 {
   "name": "caee-cli",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)",
   "main": "index.js",
   "scripts": {
     "relink": "npm run relink:cliCore",
@@ -12,5 +12,14 @@
   "license": "ISC",
   "devDependencies": {
     "lerna": "^4.0.0"
-  }
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caeeyq/caee-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/caeeyq/caee-cli/issues"
+  },
+  "homepage": "https://github.com/caeeyq/caee-cli#readme"
 }
