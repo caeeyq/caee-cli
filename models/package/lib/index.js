@@ -1,36 +1,30 @@
-import pkgDir from 'pkg-dir'
-import path from 'path'
-import npminstall from 'npminstall'
-import pathExists from 'path-exists'
-import { mkdirpSync } from 'fs-extra'
+const pkgDir = require('pkg-dir')
+const path = require('path')
+const npminstall = require('npminstall')
+const pathExists = require('path-exists')
+const { mkdirpSync } = require('fs-extra')
 
-import { formatPath } from '@caee/cli-utils-common'
-import { getDefaultRegistryUrl, getLastVersion } from '@caee/cli-utils-get-npm-info'
-import { log } from '@caee/cli-utils-log'
+const { formatPath } = require('@caee/cli-utils-common')
+const { getDefaultRegistryUrl, getLastVersion } = require('@caee/cli-utils-get-npm-info')
+const { log } = require('@caee/cli-utils-log')
 
-export class Package {
+class Package {
   /** package路径 */
-  private targetPath: string
-  /** 包缓存路径 */
-  private storePath?: string
+  targetPath
+  /** 包缓存路径? */
+  storePath
   /** package名字 */
-  private packageName: string
+  packageName
   /** package版本 */
-  private packageVersion: string
-
-  private catchFilePathPrefix: string
-
-  private catchFilePathSuffix: string
-
+  packageVersion
+  /** 缓存路径前缀 */
+  catchFilePathPrefix
+  /** 缓存路径后缀 */
+  catchFilePathSuffix
   /** package缓存文件夹 */
-  private packageFileCollection: string
+  packageFileCollection
 
-  constructor(
-    packageName_: string,
-    packageVersion_: string,
-    targetPath_: string,
-    storePath_?: string,
-  ) {
+  constructor(packageName_, packageVersion_, targetPath_, storePath_) {
     this.packageName = packageName_
     this.packageVersion = packageVersion_
     this.targetPath = targetPath_
@@ -43,8 +37,6 @@ export class Package {
     log.verbose('package construct', 'packageVersion', this.packageVersion)
     log.verbose('package construct', 'targetPath', this.targetPath)
     log.verbose('package construct', 'storePath', this.storePath)
-
-    // _@caee_cli-command-init@0.0.13@@caee
   }
 
   async prepare() {
@@ -56,16 +48,17 @@ export class Package {
     }
   }
 
-  private get catchFilePath() {
+  get catchFilePath() {
+    // _@caee_cli-command-init@0.0.13@@caee
     const fileName = `_${this.catchFilePathPrefix}@${this.packageVersion}@${this.catchFilePathSuffix}`
-    const catchPath = path.resolve(this.storePath!, fileName)
+    const catchPath = path.resolve(this.storePath, fileName)
     log.verbose('package get catchFilePath', 'value', catchPath)
     return catchPath
   }
 
-  getSpecificCatchFilePath(version: string) {
+  getSpecificCatchFilePath(version) {
     const fileName = `_${this.catchFilePathPrefix}@${version}@${this.catchFilePathSuffix}`
-    const catchPath = path.resolve(this.storePath!, fileName)
+    const catchPath = path.resolve(this.storePath, fileName)
     log.verbose('package getSpecificCatchFilePath', 'catchPath', catchPath)
     return catchPath
   }
@@ -116,7 +109,7 @@ export class Package {
         )
         await npminstall({
           root: this.targetPath,
-          storeDir: this.storePath!,
+          storeDir: this.storePath,
           registry: getDefaultRegistryUrl(),
           pkgs: [{ name: this.packageName, version: pkgLastVersion }],
         })
@@ -130,7 +123,7 @@ export class Package {
    * 获取入口文件地址
    */
   getRootFilePath() {
-    function _getRootPath(targetPath: string) {
+    function _getRootPath(targetPath) {
       const rootDir = pkgDir.sync(targetPath)
       if (rootDir) {
         const pkgPath = path.resolve(rootDir, 'package.json')
@@ -148,4 +141,8 @@ export class Package {
       return _getRootPath(this.targetPath)
     }
   }
+}
+
+module.exports = {
+  Package,
 }

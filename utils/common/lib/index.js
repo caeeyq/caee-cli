@@ -1,14 +1,19 @@
-import path from 'path'
+const path = require('path')
 /**
  * 兼容 mac 和 window 系统内的路径
  */
-export function formatPath(p: string) {
+function formatPath(p) {
   if (path.sep === '\\') {
     return p.replace(/\\/g, '/')
   }
   return p
 }
 
-export function isString(value: unknown): value is string {
+function isString(value) {
   return typeof value === 'string'
+}
+
+module.exports = {
+  formatPath,
+  isString,
 }

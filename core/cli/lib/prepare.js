@@ -1,18 +1,19 @@
-import colors from 'colors/safe'
-import rootCheck from 'root-check'
-import useHome from 'user-home'
-import pathExists from 'path-exists'
-import minimist from 'minimist'
-import dotenv from 'dotenv'
-import path from 'path'
+const colors = require('colors/safe')
+const rootCheck = require('root-check')
+const useHome = require('user-home')
+const pathExists = require('path-exists')
+const minimist = require('minimist')
+const dotenv = require('dotenv')
+const path = require('path')
 
-import { log } from '@caee/cli-utils-log'
-import { getLastVersion } from '@caee/cli-utils-get-npm-info'
+const { log } = require('@caee/cli-utils-log')
+const { getLastVersion } = require('@caee/cli-utils-get-npm-info')
 
-import pkg from './package.json'
+const pkg = require('../package.json')
 
 const DEFAULT_CLI_HOME = '.caee-cli'
-export async function prepare() {
+
+async function prepare() {
   checkPkgVersion()
   checkRoot()
   checkUserHome()
@@ -74,7 +75,7 @@ function checkInputArgs() {
  * 检查入参
  * @param args 入参
  */
-function checkArgs(args: minimist.ParsedArgs) {
+function checkArgs(args) {
   if (args.debug) {
     log.level = 'verbose'
     process.env.CAEE_CLI_LOG_LEVEL = 'verbose'
@@ -105,4 +106,8 @@ function checkUserHome() {
   if (!useHome || !pathExists.sync(useHome)) {
     throw new Error(colors.red('当前系统用户主目录不存在！'))
   }
+}
+
+module.exports = {
+  prepare,
 }

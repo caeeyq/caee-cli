@@ -1,19 +1,19 @@
-import pkg from './package.json'
-import colors from 'colors/safe'
+const pkg = require('../package.json')
+const colors = require('colors/safe')
 
-import { Command } from 'commander'
-import { log } from '@caee/cli-utils-log'
-import init from '@caee/cli-command-init'
-import { exec } from '@caee/cli-core-exec'
+const { Command } = require('commander')
+const { log } = require('@caee/cli-utils-log')
+const { init } = require('@caee/cli-command-init')
+const { exec } = require('@caee/cli-core-exec')
 
-import { prepare } from './prepare'
+const { prepare } = require('./prepare')
 
-export async function core() {
+async function core() {
   try {
     await prepare()
     registCommander()
   } catch (error) {
-    log.error('cli', (error as Error).message)
+    log.error('cli', error.message)
     if (process.env.CAEE_CLI_LOG_LEVEL === 'verbose') {
       console.log(error)
     }
@@ -68,4 +68,8 @@ function registCommander() {
     program.outputHelp()
     console.log()
   }
+}
+
+module.exports = {
+  core,
 }

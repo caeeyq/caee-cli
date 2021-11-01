@@ -30,9 +30,5 @@
     "axios": "^0.24.0",
     "semver": "^7.3.5",
     "url-join": "^4.0.1"
-  },
-  "devDependencies": {
-    "@types/semver": "^7.3.9",
-    "@types/url-join": "^4.0.1"
   }
 }

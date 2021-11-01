@@ -1,20 +1,13 @@
-import fs from 'fs'
-import { Command as Commander } from 'commander'
+const fs = require('fs')
 
-import { Command } from '@caee/cli-models-command'
-import { log } from '@caee/cli-utils-log'
+const { Command } = require('@caee/cli-models-command')
+const { log } = require('@caee/cli-utils-log')
 
-interface InitOpts {
-  force?: boolean
-}
+class InitCommand extends Command {
+  projectName
+  force
 
-type InitArgv = [projectName: string, opts: InitOpts, cmd: Commander]
-
-export class InitCommand extends Command<InitArgv, InitOpts> {
-  private projectName!: string
-  private force!: boolean
-
-  constructor(argv: InitArgv) {
+  constructor(argv) {
     super(argv)
   }
 
@@ -48,6 +41,9 @@ export class InitCommand extends Command<InitArgv, InitOpts> {
   }
 }
 
-export default function init(argv: InitArgv) {
+function init(argv) {
   return new InitCommand(argv)
 }
+
+module.exports = init
+module.exports.InitCommand = InitCommand

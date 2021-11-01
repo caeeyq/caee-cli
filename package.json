@@ -4,33 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:cliCore\" \"npm run dev:cliCoreExec\" \"npm run dev:cliModelsPackage\" \"npm run dev:cliModelsCommand\" \"npm run dev:cliCommandsInit\" \"npm run dev:cliUtilsCommon\" \"npm run dev:cliUtilsGetNpmInfo\" \"npm run dev:cliUtilsLog\"",
-    "dev:cliCore": "lerna exec --scope @caee/cli-core tsc -- -w",
-    "dev:cliCoreExec": "lerna exec --scope @caee/cli-core-exec tsc -- -w",
-    "dev:cliModelsPackage": "lerna exec --scope @caee/cli-models-package tsc -- -w",
-    "dev:cliModelsCommand": "lerna exec --scope @caee/cli-models-command tsc -- -w",
-    "dev:cliCommandsInit": "lerna exec --scope @caee/cli-commands-init tsc -- -w",
-    "dev:cliUtilsCommon": "lerna exec --scope @caee/cli-utils-common tsc -- -w",
-    "dev:cliUtilsGetNpmInfo": "lerna exec --scope @caee/cli-utils-get-npm-info tsc -- -w",
-    "dev:cliUtilsLog": "lerna exec --scope @caee/cli-utils-log tsc -- -w",
-    "relink": "npm run relink:cliModelsCommand && npm run relink:cliModelsPackage && npm run relink:cliExec && npm run relink:cliCore && npm run relink:cliCommandInit",
-    "relink:cliCommandInit": "lerna exec --scope @caee/cli-command-init npm unlink && lerna exec --scope @caee/cli-command-init npm link",
-    "relink:cliCore": "lerna exec --scope @caee/cli-core npm unlink && lerna exec --scope @caee/cli-core npm link",
-    "relink:cliExec": "lerna exec --scope @caee/cli-core-exec npm unlink && lerna exec --scope @caee/cli-core-exec npm link",
-    "relink:cliModelsPackage": "lerna exec --scope @caee/cli-models-package npm unlink && lerna exec --scope @caee/cli-models-package npm link",
-    "relink:cliModelsCommand": "lerna exec --scope @caee/cli-models-command npm unlink && lerna exec --scope @caee/cli-models-command npm link",
-    "publish": "npm run build && lerna publish",
-    "clean": "lerna exec -- shx rm -rf lib && shx echo =====clear-end=====",
-    "build": "npm run clean && lerna exec -- tsc && shx echo =====build-end====="
+    "relink": "npm run relink:cliCore",
+    "relink:cliCore": "lerna exec --scope @caee/cli-core npm unlink && lerna exec --scope @caee/cli-core npm link"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^16.11.4",
-    "concurrently": "^6.3.0",
-    "lerna": "^4.0.0",
-    "shx": "^0.3.3",
-    "typescript": "^4.4.4"
+    "lerna": "^4.0.0"
   }
 }
