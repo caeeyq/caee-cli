@@ -1,6 +1,6 @@
 {
   "name": "@caee/cli-models-command",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "> TODO: description",
   "author": "yujie <158392613@qq.com>",
   "homepage": "https://github.com/caeeyq/caee-cli#readme",
@@ -27,11 +27,11 @@
     "url": "https://github.com/caeeyq/caee-cli/issues"
   },
   "dependencies": {
+    "@caee/cli-utils-common": "file:../../utils/common",
+    "@caee/cli-utils-log": "file:../../utils/log",
     "colors": "^1.4.0",
     "commander": "^8.3.0",
-    "semver": "^7.3.5",
-    "@caee/cli-utils-log": "file:../../utils/log",
-    "@caee/cli-utils-common": "file:../../utils/common"
+    "semver": "^7.3.5"
   },
   "devDependencies": {
     "@types/colors": "^1.2.1",
