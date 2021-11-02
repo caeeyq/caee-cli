@@ -1,9 +1,9 @@
 {
-  "name": "@caee/cli-command-init",
+  "name": "@caee/cli-utils-request",
   "version": "0.0.18",
   "description": "> TODO: description",
   "author": "yujie <158392613@qq.com>",
-  "homepage": "https://github.com/caeeyq/caee-cli#readme",
+  "homepage": "https://github.com/caeeyq/caee-cli/tree/main/utils/cli-utils-request#readme",
   "license": "ISC",
   "main": "lib/index.js",
   "directories": {
@@ -27,11 +27,6 @@
     "url": "https://github.com/caeeyq/caee-cli/issues"
   },
   "dependencies": {
-    "@caee/cli-models-command": "file:../../models/command",
-    "@caee/cli-utils-log": "file:../../utils/log",
-    "@caee/cli-utils-request": "file:../../utils/request",
-    "fs-extra": "^10.0.0",
-    "inquirer": "^8.2.0",
-    "semver": "^7.3.5"
+    "axios": "^0.24.0"
   }
 }

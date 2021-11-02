@@ -6,6 +6,8 @@ const semver = require('semver')
 const {Command} = require('@caee/cli-models-command')
 const {log} = require('@caee/cli-utils-log')
 
+const {getTemplateInfo} = require('./api')
+
 const TYPE_PROJECT = 'project'
 const TYPE_COMPONENT = 'component'
 
@@ -25,7 +27,18 @@ class InitCommand extends Command {
   }
 
   async exec() {
-    await this.prepare()
+    try {
+      const projectInfo = await this.prepare()
+      log.verbose('InitCommand', 'exec projectInfo', projectInfo)
+      await this.downloadTemplate()
+    } catch (e) {
+      log.error('InitCommand', 'exec', e.message)
+    }
+  }
+
+  async downloadTemplate() {
+    const templateInfo = await getTemplateInfo()
+    console.log(templateInfo)
   }
 
   async prepare() {
@@ -116,7 +129,6 @@ class InitCommand extends Command {
         }
       ])
       projectInfo = {type, ...info}
-      log.verbose('InitCommand', 'projectInfo:', projectInfo)
     } else if (type === TYPE_COMPONENT) {
 
     }
