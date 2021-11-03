@@ -37,6 +37,9 @@ class Package {
     log.verbose('package construct', 'packageVersion', this.packageVersion)
     log.verbose('package construct', 'targetPath', this.targetPath)
     log.verbose('package construct', 'storePath', this.storePath)
+    log.verbose('package construct', 'catchFilePathPrefix', this.catchFilePathPrefix)
+    log.verbose('package construct', 'catchFilePathSuffix', this.catchFilePathSuffix)
+    log.verbose('package construct', 'packageFileCollection', this.packageFileCollection)
   }
 
   async prepare() {

@@ -6,6 +6,7 @@ const semver = require('semver')
 
 const {Command} = require('@caee/cli-models-command')
 const {Package} = require('@caee/cli-models-package')
+const {startLoading} = require('@caee/cli-utils-common')
 const {log} = require('@caee/cli-utils-log')
 
 const {getTemplateInfo} = require('./api')
@@ -50,13 +51,16 @@ class InitCommand extends Command {
     const {templateInfo} = this.projectInfo
     const targetPath = path.resolve(process.env.CAEE_CLI_HOME_PATH, TEMPLATE_CATCH_DIR)
     const storePath = path.resolve(targetPath, 'node_modules')
-    const {npmName, version} = templateInfo
+    const {npmName, version, name} = templateInfo
     const pkg = new Package(npmName, version, targetPath, storePath)
+    const spinner = startLoading(`正在下载 ${name} 模板...`)
     if (await pkg.exists()) {
       await pkg.update()
     } else {
       await pkg.install()
     }
+    spinner.stop(true)
+    log.info('installTemplate', `${name} 模板下载完成`)
   }
 
   async prepare() {
