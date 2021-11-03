@@ -1,19 +1,28 @@
 const fs = require('fs')
 const inquirer = require('inquirer')
 const fse = require('fs-extra')
+const path = require('path')
 const semver = require('semver')
 
 const {Command} = require('@caee/cli-models-command')
+const {Package} = require('@caee/cli-models-package')
 const {log} = require('@caee/cli-utils-log')
 
 const {getTemplateInfo} = require('./api')
 
 const TYPE_PROJECT = 'project'
 const TYPE_COMPONENT = 'component'
+const TEMPLATE_CATCH_DIR = 'template'
 
 class InitCommand extends Command {
+  /** 项目名称 */
   projectName
+  /** 是否强制更新 */
   force
+  /** 用户输入的项目信息 */
+  projectInfo
+  /** 项目模板信息 */
+  templateList
 
   constructor(argv) {
     super(argv)
@@ -22,14 +31,15 @@ class InitCommand extends Command {
   init() {
     this.projectName = this.values[0]
     this.force = !!this.opts.force
+    this.templateList = []
     log.verbose('InitCommand init', 'projectName', this.projectName)
     log.verbose('InitCommand init', 'force', this.force)
   }
 
   async exec() {
     try {
-      const projectInfo = await this.prepare()
-      log.verbose('InitCommand', 'exec projectInfo', projectInfo)
+      this.projectInfo = await this.prepare()
+      log.verbose('InitCommand', 'exec projectInfo', this.projectInfo)
       await this.downloadTemplate()
     } catch (e) {
       log.error('InitCommand', 'exec', e.message)
@@ -37,11 +47,24 @@ class InitCommand extends Command {
   }
 
   async downloadTemplate() {
-    const templateInfo = await getTemplateInfo()
-    console.log(templateInfo)
+    const {templateInfo} = this.projectInfo
+    const targetPath = path.resolve(process.env.CAEE_CLI_HOME_PATH, TEMPLATE_CATCH_DIR)
+    const storePath = path.resolve(targetPath, 'node_modules')
+    const {npmName, version} = templateInfo
+    const pkg = new Package(npmName, version, targetPath, storePath)
+    if (await pkg.exists()) {
+      await pkg.update()
+    } else {
+      await pkg.install()
+    }
   }
 
   async prepare() {
+    this.templateList = await getTemplateInfo()
+    if (this.templateList.length <= 0) {
+      throw new Error('远端无模板数据！')
+    }
+    log.verbose('InitCommand', 'prepare templateInfo', this.templateList)
     const cwdPath = process.cwd()
     // 1. 判断当前目录是否为空
     if (!this.isDirEmpty(cwdPath)) {
@@ -126,6 +149,15 @@ class InitCommand extends Command {
             }, 0);
           },
           filter: (v) => semver.valid(v) || v
+        },
+        {
+          type: 'list',
+          name: 'templateInfo',
+          message: '请选择合适的模板',
+          choices: this.getTemplateChoices(),
+          filter: (templateId) => {
+            return this.templateList.find(template => template._id === templateId)
+          }
         }
       ])
       projectInfo = {type, ...info}
@@ -142,6 +174,15 @@ class InitCommand extends Command {
       return !fileName.startsWith('.') && !whiteList.includes(fileName)
     })
     return fileList.length <= 0
+  }
+
+  getTemplateChoices() {
+    return this.templateList.map(template => {
+      return {
+        value: template._id,
+        name: template.name
+      }
+    })
   }
 }
 

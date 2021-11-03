@@ -1,7 +1,10 @@
 export interface ProcessEnv {
+  /** 缓存文件夹名称 */
   CAEE_CLI_HOME?: string
+  /** 缓存文件夹路径 */
   CAEE_CLI_HOME_PATH: string
   CAEE_CLI_TARGET_PATH?: string
+  CAEE_CLI_BASE_URL?: string
   CAEE_CLI_LOG_LEVEL:
     | 'silly'
     | 'verbose'
