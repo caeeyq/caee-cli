@@ -54,12 +54,17 @@ class InitCommand extends Command {
     const {npmName, version, name} = templateInfo
     const pkg = new Package(npmName, version, targetPath, storePath)
     const spinner = startLoading(`正在下载 ${name} 模板...`)
-    if (await pkg.exists()) {
-      await pkg.update()
-    } else {
-      await pkg.install()
+    try {
+      if (await pkg.exists()) {
+        await pkg.update()
+      } else {
+        await pkg.install()
+      }
+    } catch (e) {
+      throw e
+    } finally {
+      spinner.stop(true)
     }
-    spinner.stop(true)
     log.info('installTemplate', `${name} 模板下载完成`)
   }
 
