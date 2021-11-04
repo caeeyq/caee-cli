@@ -32,9 +32,34 @@ function sleep(time = 1000) {
   return new Promise(resolve => setTimeout(resolve, time))
 }
 
+function spawn(command, args, options) {
+  const win32 = process.platform === 'win32'
+
+  const cmd = win32 ? 'cmd' : command
+  const cmdArgs = win32 ? ['/c'].concat(command, args) : args
+
+  return require('child_process').spawn(cmd, cmdArgs, options || {})
+}
+
+/**
+ * 子线程异步执行命令
+ * @param command {string}
+ * @param args {string[]}
+ * @param options {object}
+ * @returns {Promise<unknown>}
+ */
+async function execAsync(command, args, options) {
+  return new Promise(((resolve, reject) => {
+    const child = spawn(command, args, options)
+    child.on('error', reject)
+    child.on('exit', resolve)
+  }))
+}
+
 module.exports = {
   formatPath,
   isString,
   startLoading,
   sleep,
+  execAsync
 }

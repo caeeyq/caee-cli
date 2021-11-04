@@ -31,7 +31,6 @@
     "@caee/cli-models-package": "file:../../models/package",
     "@caee/cli-utils-common": "file:../../utils/common",
     "@caee/cli-utils-log": "file:../../utils/log",
-    "@caee/cli-utils-request": "file:../../utils/request",
     "fs-extra": "^10.0.0",
     "inquirer": "^8.2.0",
     "semver": "^7.3.5"

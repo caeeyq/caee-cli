@@ -6,7 +6,7 @@ const semver = require('semver')
 
 const {Command} = require('@caee/cli-models-command')
 const {Package} = require('@caee/cli-models-package')
-const {startLoading} = require('@caee/cli-utils-common')
+const {startLoading, execAsync} = require('@caee/cli-utils-common')
 const {log} = require('@caee/cli-utils-log')
 
 const {getTemplateInfo} = require('./api')
@@ -14,6 +14,9 @@ const {getTemplateInfo} = require('./api')
 const TYPE_PROJECT = 'project'
 const TYPE_COMPONENT = 'component'
 const TEMPLATE_CATCH_DIR = 'template'
+const TEMPLATE_NORMAL_TYPE = 'normal'
+const TEMPLATE_CUSTOM_TYPE = 'custom'
+const WHITE_TEMPLATE_CMD = ['npm', 'cnpm']
 
 class InitCommand extends Command {
   /** 项目名称 */
@@ -24,6 +27,11 @@ class InitCommand extends Command {
   projectInfo
   /** 项目模板信息 */
   templateList
+  /**
+   * 模板包实例
+   * @type Package
+   */
+  templatePackage
 
   constructor(argv) {
     super(argv)
@@ -42,23 +50,104 @@ class InitCommand extends Command {
       this.projectInfo = await this.prepare()
       log.verbose('InitCommand', 'exec projectInfo', this.projectInfo)
       await this.downloadTemplate()
+      await this.installTemplate()
     } catch (e) {
       log.error('InitCommand', 'exec', e.message)
     }
   }
 
+  /**
+   * 安装模板
+   * @returns {Promise<void>}
+   */
+  async installTemplate() {
+    const {templateInfo} = this.projectInfo
+    if (!templateInfo) throw new Error('模板信息不存在！')
+    if (!templateInfo.type) templateInfo.type = TEMPLATE_NORMAL_TYPE
+    switch (templateInfo.type) {
+      case TEMPLATE_NORMAL_TYPE:
+        await this.installNormalTemplate()
+        break
+      case TEMPLATE_CUSTOM_TYPE:
+        await this.installCustomTemplate()
+        break
+      default:
+        throw new Error('未知的模板类型！')
+    }
+  }
+
+  /**
+   * 安装标准模板
+   * @returns {Promise<void>}
+   */
+  async installNormalTemplate() {
+    const spinner = startLoading('正在安装模板...')
+    const {packageFileCollection} = this.templatePackage
+    const {templateInfo} = this.projectInfo
+    try {
+      const templatePath = path.resolve(this.templatePackage.catchFilePath, packageFileCollection, 'template')
+      const targetPath = process.cwd()
+      fse.ensureDirSync(templatePath)
+      fse.ensureDirSync(targetPath)
+      fse.copySync(templatePath, targetPath)
+    } catch (e) {
+      throw e
+    } finally {
+      spinner.stop(true)
+    }
+    log.info('installNormalTemplate', `${templateInfo.name} 模板安装完成:)`)
+    log.info('installNormalTemplate', `执行 ${templateInfo.name} 模板依赖安装`)
+    const {installCommand = 'npm install', startCommand = 'npm run dev'} = templateInfo
+    await this.execCommand(installCommand, '依赖安装过程出错！')
+    await this.execCommand(startCommand, '启动模板过程出错！')
+  }
+
+  /**
+   * 安装自定义模板
+   * @returns {Promise<void>}
+   */
+  async installCustomTemplate() {
+    console.log('安装自定义模板...')
+  }
+
+  /**
+   * 执行指定命令
+   * @param commandStr
+   * @param errMessage
+   * @returns {Promise<void>}
+   */
+  async execCommand(commandStr, errMessage) {
+    const commandList = commandStr.split(' ')
+    const cmd = this.checkCmd(commandList[0])
+    const args = commandList.splice(1)
+    log.verbose('InitCommand', 'execCommand', commandList, cmd, args)
+
+    if (!cmd) throw new Error(`异常命令，无法执行，命令：${commandStr}`)
+    const res = await execAsync(cmd, args, {stdio: 'inherit'})
+    if (res !== 0) throw new Error(errMessage)
+  }
+
+  checkCmd(cmd) {
+    if (WHITE_TEMPLATE_CMD.includes(cmd)) return cmd
+    return null
+  }
+
+  /**
+   * 下载更新本地模板缓存
+   * @returns {Promise<void>}
+   */
   async downloadTemplate() {
     const {templateInfo} = this.projectInfo
     const targetPath = path.resolve(process.env.CAEE_CLI_HOME_PATH, TEMPLATE_CATCH_DIR)
     const storePath = path.resolve(targetPath, 'node_modules')
     const {npmName, version, name} = templateInfo
-    const pkg = new Package(npmName, version, targetPath, storePath)
+    this.templatePackage = new Package(npmName, version, targetPath, storePath)
     const spinner = startLoading(`正在下载 ${name} 模板...`)
     try {
-      if (await pkg.exists()) {
-        await pkg.update()
+      if (await this.templatePackage.exists()) {
+        await this.templatePackage.update()
       } else {
-        await pkg.install()
+        await this.templatePackage.install()
       }
     } catch (e) {
       throw e
@@ -97,14 +186,20 @@ class InitCommand extends Command {
           message: '是否确认清空当前目录?'
         })
         if (clearDir) {
+          const spinner = startLoading('正在删除当前目录下所有文件...')
           log.verbose('InitCommand', 'prepare', '清空当前目录...')
-          fse.emptyDirSync(cwdPath)
+          await fse.emptyDir(cwdPath)
+          spinner.stop(true)
         }
       }
     }
     return this.getProjectInfo()
   }
 
+  /**
+   * 获取用户输入需要创建的项目信息
+   * @returns {Promise<{}>}
+   */
   async getProjectInfo() {
     let projectInfo = {}
     // 3. 选择创建项目还是组件
