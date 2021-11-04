@@ -62,6 +62,52 @@ class InitCommand extends Command {
   }
 
   /**
+   * 做一些准备工作
+   * 1. 获取服务端模板列表
+   * 2. 判断当前执行目录是否为空，并做一些目录的清理工作
+   * 3. 执行一些后续的项目信息获取流程 getProjectInfo
+   * @returns {Promise<{}>}
+   */
+  async prepare() {
+    this.templateList = await getTemplateInfo()
+    if (this.templateList.length <= 0) {
+      throw new Error('远端无模板数据！')
+    }
+    log.verbose('InitCommand', 'prepare templateInfo', this.templateList)
+    const cwdPath = process.cwd()
+    // 1. 判断当前目录是否为空
+    if (!this.isDirEmpty(cwdPath)) {
+      let ifContinue = false
+      if (!this.force) {
+        // 1.1 询问是否继续创建
+        ifContinue = (await inquirer.prompt({
+          type: 'confirm',
+          name: 'ifContinue',
+          default: false,
+          message: '当前文件夹不为空,是否继续创建?',
+        })).ifContinue
+        if (!ifContinue) return
+      }
+      // 2. 是否启用强制更新
+      if (ifContinue || this.force) {
+        const {clearDir} = await inquirer.prompt({
+          type: 'confirm',
+          name: 'clearDir',
+          default: false,
+          message: '是否确认清空当前目录?'
+        })
+        if (clearDir) {
+          const spinner = startLoading('正在删除当前目录下所有文件...')
+          log.verbose('InitCommand', 'prepare', '清空当前目录...')
+          await fse.emptyDir(cwdPath)
+          spinner.stop(true)
+        }
+      }
+    }
+    return this.getProjectInfo()
+  }
+
+  /**
    * 安装模板
    * @returns {Promise<void>}
    */
@@ -100,11 +146,11 @@ class InitCommand extends Command {
     } finally {
       spinner.stop(true)
     }
-    const ignore = ['node_modules/**', '**/public/**', '**/assets/**']
-    await this.ejsRender({ignore})
+    const {ejsIgnore = [], installCommand = 'npm install', startCommand = 'npm run dev'} = templateInfo
+    log.verbose('InitCommand', 'installNormalTemplate ejsIgnore', ejsIgnore)
+    await this.ejsRender({ignore: ejsIgnore})
     log.info('installNormalTemplate', `${templateInfo.name} 模板安装完成:)`)
     log.info('installNormalTemplate', `执行 ${templateInfo.name} 模板依赖安装`)
-    const {installCommand = 'npm install', startCommand = 'npm run dev'} = templateInfo
     await this.execCommand(installCommand, '依赖安装过程出错！')
     await this.execCommand(startCommand, '启动模板过程出错！')
   }
@@ -152,6 +198,11 @@ class InitCommand extends Command {
     if (res !== 0) throw new Error(errMessage)
   }
 
+  /**
+   * 检查执行命令，防止风险命令被执行
+   * @param cmd
+   * @returns {null|*}
+   */
   checkCmd(cmd) {
     if (WHITE_TEMPLATE_CMD.includes(cmd)) return cmd
     return null
@@ -182,45 +233,6 @@ class InitCommand extends Command {
     log.info('installTemplate', `${name} 模板下载完成`)
   }
 
-  async prepare() {
-    this.templateList = await getTemplateInfo()
-    if (this.templateList.length <= 0) {
-      throw new Error('远端无模板数据！')
-    }
-    log.verbose('InitCommand', 'prepare templateInfo', this.templateList)
-    const cwdPath = process.cwd()
-    // 1. 判断当前目录是否为空
-    if (!this.isDirEmpty(cwdPath)) {
-      let ifContinue = false
-      if (!this.force) {
-        // 1.1 询问是否继续创建
-        ifContinue = (await inquirer.prompt({
-          type: 'confirm',
-          name: 'ifContinue',
-          default: false,
-          message: '当前文件夹不为空,是否继续创建?',
-        })).ifContinue
-        if (!ifContinue) return
-      }
-      // 2. 是否启用强制更新
-      if (ifContinue || this.force) {
-        const {clearDir} = await inquirer.prompt({
-          type: 'confirm',
-          name: 'clearDir',
-          default: false,
-          message: '是否确认清空当前目录?'
-        })
-        if (clearDir) {
-          const spinner = startLoading('正在删除当前目录下所有文件...')
-          log.verbose('InitCommand', 'prepare', '清空当前目录...')
-          await fse.emptyDir(cwdPath)
-          spinner.stop(true)
-        }
-      }
-    }
-    return this.getProjectInfo()
-  }
-
   /**
    * 获取用户输入需要创建的项目信息
    * @returns {Promise<{}>}
@@ -238,6 +250,11 @@ class InitCommand extends Command {
       }
     )
     log.verbose('InitCommand', 'getProjectInfo type: ', type)
+    // 筛选模板
+    this.templateList = this.templateList.filter(template => {
+      const {tags = []} = template
+      return tags.includes(type)
+    })
     if (type === TYPE_PROJECT) {
       log.verbose('InitCommand', '当前为项目类型,进入项目信息获取流程...')
       const info = await inquirer.prompt([
@@ -300,6 +317,11 @@ class InitCommand extends Command {
     return projectInfo
   }
 
+  /**
+   * 目标目录下是否为空
+   * @param targetPath
+   * @returns {boolean}
+   */
   isDirEmpty(targetPath) {
     const fileList = fs.readdirSync(targetPath).filter(fileName => {
       const whiteList = ['node_modules']
@@ -308,6 +330,10 @@ class InitCommand extends Command {
     return fileList.length <= 0
   }
 
+  /**
+   * 格式化模板列表信息，使其符合 inquirer 列表的数据结构
+   * @returns {*}
+   */
   getTemplateChoices() {
     return this.templateList.map(template => {
       return {
