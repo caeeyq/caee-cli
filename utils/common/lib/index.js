@@ -56,10 +56,20 @@ async function execAsync(command, args, options) {
   }))
 }
 
+function globAsync(pattern, options) {
+  return new Promise(((resolve, reject) => {
+    require('glob')(pattern, options, (er, files) => {
+      if (er) reject(er)
+      resolve(files)
+    })
+  }))
+}
+
 module.exports = {
   formatPath,
   isString,
   startLoading,
   sleep,
-  execAsync
+  execAsync,
+  globAsync
 }

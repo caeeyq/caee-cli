@@ -3,19 +3,23 @@ const inquirer = require('inquirer')
 const fse = require('fs-extra')
 const path = require('path')
 const semver = require('semver')
+const ejs = require('ejs')
 
 const {Command} = require('@caee/cli-models-command')
 const {Package} = require('@caee/cli-models-package')
-const {startLoading, execAsync} = require('@caee/cli-utils-common')
+const {startLoading, execAsync, globAsync} = require('@caee/cli-utils-common')
 const {log} = require('@caee/cli-utils-log')
 
 const {getTemplateInfo} = require('./api')
 
 const TYPE_PROJECT = 'project'
 const TYPE_COMPONENT = 'component'
+
 const TEMPLATE_CATCH_DIR = 'template'
+
 const TEMPLATE_NORMAL_TYPE = 'normal'
 const TEMPLATE_CUSTOM_TYPE = 'custom'
+
 const WHITE_TEMPLATE_CMD = ['npm', 'cnpm']
 
 class InitCommand extends Command {
@@ -25,7 +29,7 @@ class InitCommand extends Command {
   force
   /** 用户输入的项目信息 */
   projectInfo
-  /** 项目模板信息 */
+  /** 远端获取的项目模板信息列表 */
   templateList
   /**
    * 模板包实例
@@ -48,6 +52,7 @@ class InitCommand extends Command {
   async exec() {
     try {
       this.projectInfo = await this.prepare()
+      if (!this.projectInfo) return
       log.verbose('InitCommand', 'exec projectInfo', this.projectInfo)
       await this.downloadTemplate()
       await this.installTemplate()
@@ -95,6 +100,8 @@ class InitCommand extends Command {
     } finally {
       spinner.stop(true)
     }
+    const ignore = ['node_modules/**', '**/public/**', '**/assets/**']
+    await this.ejsRender({ignore})
     log.info('installNormalTemplate', `${templateInfo.name} 模板安装完成:)`)
     log.info('installNormalTemplate', `执行 ${templateInfo.name} 模板依赖安装`)
     const {installCommand = 'npm install', startCommand = 'npm run dev'} = templateInfo
@@ -108,6 +115,24 @@ class InitCommand extends Command {
    */
   async installCustomTemplate() {
     console.log('安装自定义模板...')
+  }
+
+  /**
+   * ejs渲染
+   * @param option
+   * @returns {Promise<unknown[]>}
+   */
+  async ejsRender(option) {
+    const targetPath = process.cwd()
+    const filesPathList = await globAsync('**', {ignore: option.ignore, cwd: targetPath, nodir: true})
+    const renderPromiseList = filesPathList.map(filePath => new Promise((resolve, reject) => {
+      ejs.renderFile(filePath, this.projectInfo, {}, (err, str) => {
+        if (err) reject(err)
+        fse.writeFileSync(filePath, str)
+        resolve()
+      })
+    }))
+    return Promise.all(renderPromiseList)
   }
 
   /**
@@ -220,7 +245,7 @@ class InitCommand extends Command {
           type: 'input',
           name: 'projectName',
           message: '请输入项目名称',
-          default: 'caee-demo',
+          default: this.projectName || 'caee-demo',
           validate: function (v) {
             // 1. 首字符必须为英文字符
             // 2. 尾字符必须为英文或者数字
@@ -267,6 +292,9 @@ class InitCommand extends Command {
       projectInfo = {type, ...info}
     } else if (type === TYPE_COMPONENT) {
 
+    }
+    if (projectInfo.projectName) {
+      projectInfo.packageJsonName = require('kebab-case')(projectInfo.projectName).replace(/^-/, '')
     }
     // 4. 获取项目的基本信息
     return projectInfo

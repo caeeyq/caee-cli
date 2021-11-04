@@ -2,11 +2,11 @@ const pkgDir = require('pkg-dir')
 const path = require('path')
 const npminstall = require('npminstall')
 const pathExists = require('path-exists')
-const { mkdirpSync } = require('fs-extra')
+const {mkdirpSync} = require('fs-extra')
 
-const { formatPath } = require('@caee/cli-utils-common')
-const { getDefaultRegistryUrl, getLastVersion } = require('@caee/cli-utils-get-npm-info')
-const { log } = require('@caee/cli-utils-log')
+const {formatPath} = require('@caee/cli-utils-common')
+const {getDefaultRegistryUrl, getLastVersion} = require('@caee/cli-utils-get-npm-info')
+const {log} = require('@caee/cli-utils-log')
 
 class Package {
   /** package路径 */
@@ -85,12 +85,12 @@ class Package {
   async install() {
     await this.prepare()
     this.storePath &&
-      (await npminstall({
-        root: this.targetPath,
-        storeDir: this.storePath,
-        registry: getDefaultRegistryUrl(),
-        pkgs: [{ name: this.packageName, version: this.packageVersion }],
-      }))
+    (await npminstall({
+      root: this.targetPath,
+      storeDir: this.storePath,
+      registry: getDefaultRegistryUrl(),
+      pkgs: [{name: this.packageName, version: this.packageVersion}],
+    }))
   }
 
   /**
@@ -114,10 +114,10 @@ class Package {
           root: this.targetPath,
           storeDir: this.storePath,
           registry: getDefaultRegistryUrl(),
-          pkgs: [{ name: this.packageName, version: pkgLastVersion }],
+          pkgs: [{name: this.packageName, version: pkgLastVersion}],
         })
-        this.packageVersion = pkgLastVersion
       }
+      this.packageVersion = pkgLastVersion
       return catchPath
     }
   }
@@ -138,6 +138,7 @@ class Package {
         }
       }
     }
+
     if (this.storePath) {
       return _getRootPath(path.resolve(this.catchFilePath, this.packageFileCollection))
     } else {
