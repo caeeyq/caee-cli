@@ -1,6 +1,6 @@
 {
   "name": "@caee/cli-command-init",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "> TODO: description",
   "author": "yujie <158392613@qq.com>",
   "homepage": "https://github.com/caeeyq/caee-cli#readme",
@@ -32,10 +32,10 @@
     "@caee/cli-utils-common": "file:../../utils/common",
     "@caee/cli-utils-log": "file:../../utils/log",
     "@caee/cli-utils-request": "file:../../utils/request",
+    "ejs": "^3.1.6",
     "fs-extra": "^10.0.0",
     "inquirer": "^8.2.0",
-    "semver": "^7.3.5",
     "kebab-case": "^1.0.1",
-    "ejs": "^3.1.6"
+    "semver": "^7.3.5"
   }
 }
