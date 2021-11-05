@@ -160,7 +160,16 @@ class InitCommand extends Command {
    * @returns {Promise<void>}
    */
   async installCustomTemplate() {
-    console.log('安装自定义模板...')
+    log.notice('installCustomTemplate', '执行安装自定义模板流程...')
+    if (!await this.templatePackage.exists()) throw new Error('模板文件不存在！')
+    const rootFilePath = this.templatePackage.getRootFilePath()
+    if (!fse.existsSync(rootFilePath)) throw new Error('模板入口文件不存在！')
+
+    const sourcePath = path.resolve(this.templatePackage.catchFilePath, this.templatePackage.packageFileCollection, 'template')
+    const targetPath = process.cwd()
+    const options = {...this.projectInfo, sourcePath, targetPath}
+    const code = `require('${rootFilePath}')(${JSON.stringify(options)})`
+    await execAsync('node', ['-e', code], {stdio: 'inherit', cwd: process.cwd()})
   }
 
   /**
@@ -238,7 +247,7 @@ class InitCommand extends Command {
    * @returns {Promise<{}>}
    */
   async getProjectInfo() {
-    let projectInfo = {}
+    let projectInfo
     // 3. 选择创建项目还是组件
     const {type} = await inquirer.prompt(
       {
@@ -249,72 +258,104 @@ class InitCommand extends Command {
         choices: [{value: TYPE_PROJECT, name: '项目'}, {value: TYPE_COMPONENT, name: '组件'}]
       }
     )
-    log.verbose('InitCommand', 'getProjectInfo type: ', type)
     // 筛选模板
     this.templateList = this.templateList.filter(template => {
       const {tags = []} = template
       return tags.includes(type)
     })
-    if (type === TYPE_PROJECT) {
-      log.verbose('InitCommand', '当前为项目类型,进入项目信息获取流程...')
-      const info = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'projectName',
-          message: '请输入项目名称',
-          default: this.projectName || 'caee-demo',
-          validate: function (v) {
-            // 1. 首字符必须为英文字符
-            // 2. 尾字符必须为英文或者数字
-            // right: a-b, a_b, aaa, bbb, aa11
-            // wrong: a_ a-
-            const reg = /^[a-zA-Z]+([-][a-zA-Z][a-zA-Z0-9]*|[_][a-zA-Z][a-zA-Z0-9]*|[a-zA-Z0-9]*$)/
-            const done = this.async();
-            setTimeout(function () {
-              if (!reg.test(v)) {
-                done('请输入合法的项目名称！');
-                return;
-              }
-              done(null, true);
-            }, 0);
-          }
-        },
-        {
-          type: 'input',
-          name: 'projectVersion',
-          message: '请输入项目版本号',
-          default: '0.0.0',
-          validate: function (v) {
-            const done = this.async();
-            setTimeout(function () {
-              if (!(!!semver.valid(v))) {
-                done('请输入合法的版本号！');
-                return;
-              }
-              done(null, true);
-            }, 0);
-          },
-          filter: (v) => semver.valid(v) || v
-        },
-        {
-          type: 'list',
-          name: 'templateInfo',
-          message: '请选择合适的模板',
-          choices: this.getTemplateChoices(),
-          filter: (templateId) => {
-            return this.templateList.find(template => template._id === templateId)
-          }
-        }
-      ])
-      projectInfo = {type, ...info}
-    } else if (type === TYPE_COMPONENT) {
-
-    }
+    log.verbose('InitCommand', `当前为${type}类型,进入信息获取流程...`)
+    const info = await inquirer.prompt(this.getInquirePromptInfo(type))
+    projectInfo = {type, ...info}
+    // 得到非驼峰命名
     if (projectInfo.projectName) {
       projectInfo.packageJsonName = require('kebab-case')(projectInfo.projectName).replace(/^-/, '')
     }
-    // 4. 获取项目的基本信息
     return projectInfo
+  }
+
+  /**
+   * 收集项目信息表单项
+   * @param type
+   * @returns {[{default: string, name: string, type: string, message: string, validate: validate}, {filter: (function(*=)), default: string, name: string, type: string, message: string, validate: validate}, {filter: (function(*): *), name: string, type: string, message: string, choices: *}]}
+   */
+  getInquirePromptInfo(type) {
+    let keywords = '项目'
+    switch (type) {
+      case TYPE_PROJECT:
+        keywords = '项目'
+        break
+      case TYPE_COMPONENT:
+        keywords = '组件库'
+    }
+    const basePrompt = [
+      {
+        type: 'input',
+        name: 'projectName',
+        message: `请输入${keywords}名称`,
+        default: this.projectName || 'caee-demo',
+        validate: function (v) {
+          // 1. 首字符必须为英文字符
+          // 2. 尾字符必须为英文或者数字
+          // right: a-b, a_b, aaa, bbb, aa11
+          // wrong: a_ a-
+          const reg = /^[a-zA-Z]+([-][a-zA-Z][a-zA-Z0-9]*|[_][a-zA-Z][a-zA-Z0-9]*|[a-zA-Z0-9]*$)/
+          const done = this.async();
+          setTimeout(function () {
+            if (!reg.test(v)) {
+              done(`请输入合法的${keywords}名称！`);
+              return;
+            }
+            done(null, true);
+          }, 0);
+        }
+      },
+      {
+        type: 'input',
+        name: 'projectVersion',
+        message: `请输入${keywords}版本号`,
+        default: '0.0.0',
+        validate: function (v) {
+          const done = this.async();
+          setTimeout(function () {
+            if (!(!!semver.valid(v))) {
+              done('请输入合法的版本号！');
+              return;
+            }
+            done(null, true);
+          }, 0);
+        },
+        filter: (v) => semver.valid(v) || v
+      },
+      {
+        type: 'list',
+        name: 'templateInfo',
+        message: '请选择合适的模板',
+        choices: this.getTemplateChoices(),
+        filter: (templateId) => {
+          return this.templateList.find(template => template._id === templateId)
+        }
+      }
+    ]
+    if (type === TYPE_COMPONENT) {
+      const descriptionPrompt = {
+        type: 'input',
+        name: 'componentLibDesc',
+        message: `请输入组件库描述`,
+        default: '',
+        validate: function (v) {
+          const done = this.async();
+          setTimeout(function () {
+            if (!v) {
+              done(`组件库描述不能为空！`);
+              return;
+            }
+            done(null, true);
+          }, 0);
+        }
+      }
+      basePrompt.splice(1, 0, descriptionPrompt)
+    }
+    return basePrompt
   }
 
   /**
